@@ -14,6 +14,8 @@ from src.securing_database    import decrypt_database, encrypt_database
 from src.create_database_file import is_there_a_file, create_file
 from src.generate_password    import generate_strong_password
 from src.is_database_encrypt  import is_database_encrypt
+from src.delete_password  	  import delete_password
+from src.update_password      import update_password
 from src.save_password 	      import save_password
 from src.find_password        import find_password
 from src.const 				  import Const
@@ -34,6 +36,15 @@ def main( arges ) -> None :
 	)
 	key:str = None 
 	try :
+		# for check the arges input. - v2.0
+		check_arges: bool = True if (
+			arges.show_passwords_table or
+			arges.show_passwords or
+			arges.find_password or
+			arges.save or
+			arges.delete_password or 
+			arges.update_password
+		) else False
 		check_file_is_exists:bool = is_there_a_file(
 			DATABASE_FILE_JSON = const.DATABASE_FILE_JSON,
 			DATABASE_FILE_X = const.DATABASE_FILE_X,
@@ -45,8 +56,8 @@ def main( arges ) -> None :
 				DE_PASSWORD_PATH = const.DE_PASSWORD_PATH
 			)
 		# if the database is encryption.
-		if check_file_is_encryption and (arges.show_passwords_table or arges.show_passwords or arges.find_password or arges.save):
-			print ('You are going to access the database.. the database is encryption...! ')
+		if check_file_is_encryption and check_arges:
+			print ('You are going to access the database.. the database is encrypted...! ')
 			key = input('Enter database decryption key: ')
 			decrypt_database( # Decrypt the database before using it.
 				DE_PASSWORD_PATH = const.DE_PASSWORD_PATH,
@@ -56,6 +67,7 @@ def main( arges ) -> None :
 				load = load,
 				key=key
 			) 
+			check_file_is_encryption = False
 		# Show Passwords As Table.
 		if arges.show_passwords_table :
 			show_passwords_table(  # Print all passwords in the Console. 
@@ -109,6 +121,71 @@ def main( arges ) -> None :
 				choice = choice
 			) 
 			print (f'\033[0;34mYour password is : \033[0;32m{password}\033[0m')
+		# Delete password. - v2.0
+		elif arges.delete_password :
+			username: str = input('Enter the username: ')
+			delete_password( # Delete password function
+				username = username,
+				DE_PASSWORD_PATH = const.DE_PASSWORD_PATH,
+				load = load,
+				dump = dump
+			)
+		# Update password. - v2.0
+		elif arges.update_password :
+			username:str = input('Enter the username: ')
+			print('What do you want to update?')
+			print('1- The Password.')
+			print('2- The Username.')
+			print('3- Both.')
+			num:int = int(input('[Number]: '))
+			if num == 1 :
+				length: int = int (input("Enter the length of the password: "))
+				password: str = generate_strong_password(
+					n = length,
+					MIN_LENGTH = const.PASSWORD_MIN_LENGTH,
+					MAX_LENGTH = const.PASSWORD_MAX_LENGTH,
+					letters = const.LETTERS,
+					choice = choice
+				)
+				update_password(
+					DE_PASSWORD_PATH = const.DE_PASSWORD_PATH,
+					username = username,
+					new_password = password,
+					load = load,
+					dump = dump,
+					function = "PASSWORD"
+				)
+			elif num == 2 :
+				new_username: str = input("Enter the new username: ")
+				update_password(
+					DE_PASSWORD_PATH = const.DE_PASSWORD_PATH,
+					username = username,
+					new_username = new_username,
+					load = load,
+					dump = dump,
+					function = "USERNAME"
+				)
+			elif num == 3 :
+				new_username: str = input("Enter the new username: ")
+				length: int = int (input("Enter the length of the password: "))
+				password: str = generate_strong_password(
+					n = length,
+					MIN_LENGTH = const.PASSWORD_MIN_LENGTH,
+					MAX_LENGTH = const.PASSWORD_MAX_LENGTH,
+					letters = const.LETTERS,
+					choice = choice
+				)
+				update_password(
+					DE_PASSWORD_PATH = const.DE_PASSWORD_PATH,
+					username = username,
+					new_username = new_username,
+					new_password = password,
+					load = load,
+					dump = dump,
+					function = "BOTH"
+				)
+			else :
+				print("Ok, I won't update anything.")
 		# if the user not using any.
 		else :
 			raise Exception('Error Argument: Use `python PM.py --help` for help..!')
@@ -126,7 +203,7 @@ def main( arges ) -> None :
 			return None
 
 		# if the database is not encrypted before. 
-		if not check_file_is_encryption and (arges.show_passwords_table or arges.show_passwords or arges.find_password or arges.save):
+		if not check_file_is_encryption and check_arges:
 			print("The database is not encrytion..!")
 			cho:str = input('Do you want to encrypt it? ')
 			cho = cho.lower()
@@ -165,7 +242,7 @@ def main( arges ) -> None :
 if __name__ == "__main__" :
 	perser:ArgumentParser = ArgumentParser(
 		prog="PM",
-		epilog="This Tool Was Created by `Mohaned Sherhan` or `Mr.X` .",
+		epilog="This Tool Was Created by `Mohaned Sherhan (MR.X)`.",
 	)
 	perser.add_argument(
 		'-l',
@@ -196,6 +273,18 @@ if __name__ == "__main__" :
 		'-spt',
 		'--show-passwords-table',
 		help='Show all passwords in the database in a table.',
+		action='store_true'
+	)
+	perser.add_argument(
+		'-dp',
+		'--delete-password',
+		help='Delete the password from the database file.',
+		action='store_true'
+	)
+	perser.add_argument(
+		'-up',
+		'--update-password',
+		help='Update the password or username in the database file.',
 		action='store_true'
 	)
 	main(perser.parse_args())
