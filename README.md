@@ -24,7 +24,8 @@ specific password that has been previously saved
     - If the file is not ecrypt the tool will ask you if you need to ecrypt the file.
     - If the file was ecrypt before using, the tool will be encrypted automatically.
     - Please keep your key in a safe place and do Not share it with anyone.
-    - **Note** : if you lost you key or deleted the **JSON** file, you will not be able to access the password!
+> [!NOTE]
+> if you lost your key or deleted the **JSON** file, you will not be able to access the password!
 4) **Show Passwords:**
     - This feature shows you all passwords in the **JSON** file.
     - There are two ways to display passwords, the first displays the complete password and the other displays the passwords formatted in a table.
@@ -37,6 +38,17 @@ specific password that has been previously saved
     - You can also use any keyword for quick search.
     - Please when you add new password to the file Make sure you give it an understandable name so you can look for it at another time.
     - **Like** : `'example@gmail.com'` or `'github Mohaned2023'`.
+6) **Delete Password:**
+    - This feature delete the password from the database.
+    - Delete the password by **username**.
+> [!NOTE]
+> If you delete the password, you will not be able to recover it.
+7) **Update info:**
+    - This feature used to update the information in the database.
+    - To specify the target, you must search by entering the **username** first. 
+    - You can update 1.`Password` 2.`Username` 3.`Password and Username`.
+    - When you update the password will create for you a new password.
+    - It will ask you to enter a length for the new password.
 
 ## **Usage:**
 - **display the help message:**
@@ -63,6 +75,15 @@ python PM.py -sp | python PM.py --show-passwords
 ```bash
 python PM.py -spt | python PM.py --show-passwords-table
 ```
+- **Delete Password:**
+```bash
+python PM.py -dp | python PM.py --delete-password
+```
+- **Update Password:**
+```bash
+python PM.py -up | python PM.py --update-password
+```
+
 ## **About The Programmer:**
 Hi, my name is `Mohaned Sharhan` known as `Mr.X`.   
 - I liked that this tool worked for the purpose of protecting my accounts from being hacked by creating strong passwords, saving them, and encrypting them.   
